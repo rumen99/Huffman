@@ -16,19 +16,19 @@ private:
     int numOccur[256];
     std::string code[256];
 
-    void buildFreqTable(std::string &);
+    void buildFreqTable(const std::string &);
     void buildTree();
-    void buildCode(node *, std::string num);
-    void printTree(node *, std::ostream &out) const;
+    void buildCode(node*, std::string num);
+    void printTree(node*, std::ostream &out) const;
     void deleteTree(node *);
     node* buildTree(std::istream &in);
 
 public:
-    huffmanTree(std::string &);
+    huffmanTree(const std::string &);
     huffmanTree(std::istream &in);
     ~huffmanTree();
-    std::string compress(std::string str)  const;
-    std::string decompress(std::string str, int size) const;
+    std::string compress(const std::string str)  const;
+    std::string decompress(const std::string str, const int size) const;
     void print(std::ostream &out) const;
     void testPrint() const;
 };

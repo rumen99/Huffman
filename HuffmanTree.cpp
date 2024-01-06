@@ -1,7 +1,7 @@
 # pragma once
 # include "HuffmanTree.h"
 
-huffmanTree::huffmanTree(std:: string &input)
+huffmanTree::huffmanTree(const std:: string &input)
 {
     root = nullptr;
     for (int i = 0; i < 256; i++)
@@ -14,7 +14,7 @@ huffmanTree::huffmanTree(std:: string &input)
     buildCode(root, "");
 }
 
-void huffmanTree::buildFreqTable(std:: string &input)
+void huffmanTree::buildFreqTable(const std:: string &input)
 {
     for (int i = 0; i < input.length(); i++)
     {
@@ -52,7 +52,7 @@ void huffmanTree::buildTree()
     pq.pop();
 }
 
-void huffmanTree::buildCode(node *root, std:: string num)
+void huffmanTree::buildCode(node* root, std:: string num)
 {
     if (root->left == nullptr && root->right == nullptr)
     {
@@ -63,7 +63,7 @@ void huffmanTree::buildCode(node *root, std:: string num)
     buildCode(root->right, (num+"1"));
 }
 
-std::string huffmanTree::compress(std::string str) const
+std::string huffmanTree::compress(const std::string str) const
 {
     std::string output = "";
     int curr = 0;
@@ -100,7 +100,7 @@ std::string huffmanTree::compress(std::string str) const
     return output;
 }
 
-void huffmanTree::printTree(node *root, std::ostream &out) const
+void huffmanTree::printTree(node* root, std::ostream &out) const
 {
     /* https://stackoverflow.com/questions/759707/efficient-way-of-storing-huffman-tree */
     if (root->left == nullptr && root->right == nullptr)
@@ -189,7 +189,7 @@ huffmanTree::node* huffmanTree::buildTree(std::istream &in)
     return temp;
 }
 
-std::string huffmanTree::decompress(std::string str, int size) const
+std::string huffmanTree::decompress(const std::string str, const int size) const
 {
     std::string output = "";
     node *curr = root;
