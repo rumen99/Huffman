@@ -68,7 +68,7 @@ std::string huffmanTree::compress(std::string str) const
     std::string output = "";
     int curr = 0;
     int bits = 0;
-
+    std::string binary_rep = "";
     for (int i = 0; i < str.length(); i++)
     {
         std::string temp = code[str[i]];
@@ -77,6 +77,9 @@ std::string huffmanTree::compress(std::string str) const
             if (temp[j] == '1')
             {
                 curr = curr | 1;
+                binary_rep += "1";
+            } else {
+                binary_rep += "0";
             }
             bits++;
             if (bits == 8)
@@ -169,10 +172,10 @@ huffmanTree::huffmanTree(std::istream &in)
 huffmanTree::node* huffmanTree::buildTree(std::istream &in)
 {
     char c;
-    in >> c;
+    in.get(c);
     if (c == '1')
     {
-        in >> c;
+        in.get(c);
         node *temp = new node;
         temp->data = c;
         temp->weight = 0;
@@ -190,16 +193,20 @@ std::string huffmanTree::decompress(std::string str, int size) const
 {
     std::string output = "";
     node *curr = root;
+    std::string binary_rep = "";
     for (int i = 0; i < str.length() && output.size() < size; i++)
     {
+
         for (int j = 7; j >= 0 && output.size() < size; j--)
         {
             if ((str[i] >> j) & 1)
             {
+                binary_rep += "1";
                 curr = curr->right;
             }
             else
             {
+                binary_rep += "0";
                 curr = curr->left;
             }
             if (curr->left == nullptr && curr->right == nullptr)

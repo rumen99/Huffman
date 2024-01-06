@@ -1,11 +1,9 @@
 #include "CommandLine.h"
-#include <fstream>
-
 void commandLine::readLine()
 {
     std::string input;
     std::getline(std::cin, input);
-    enum { COMPRESS, DECOMPRESS, NONE } state = NONE;
+    enum { COMPRESS, DECOMPRESS, NONE, EXIT } state = NONE;
     
     std::string inputFile = "";
     std::string outputFile = "";
@@ -32,15 +30,42 @@ void commandLine::readLine()
             }
         } else if (option == "-p") {
             DEBUG = true;
+        } else if (option == "-h") {
+            std::cout << "Usage: -c -i <input file> -o <output file>" << std::endl;
+            std::cout << "       -d -i <input file> -o <output file> [-p]" << std::endl;
+            std::cout << "       -h" << std::endl;
+            std::cout << "Options:" << std::endl;
+            std::cout << "  -c: compress" << std::endl;
+            std::cout << "  -d: decompress" << std::endl;
+            std::cout << "  -i: input file" << std::endl;
+            std::cout << "  -o: output file" << std::endl;
+            std::cout << "  -p: print debug info" << std::endl;
+            std::cout << "  -h: help" << std::endl;
+            std::cout << "  -e: exit" << std::endl;
+            return;
+        } else if (option == "-e") {
+            state = EXIT;
+            return;
+        }else {
+            std::cout << "Invalid option. Try -h for more information!" << option << std::endl;
+            return;
         }
+
+
         input.erase(0, pos + 2);
     }
     
+    if (state == EXIT) {
+        std::cout << "Exiting..." << std::endl;
+        exit(0);
+        return;
+    }
 
 
     if (state != NONE && !inputFile.empty() && !outputFile.empty()) {
-        std::ifstream in(inputFile);
-        std::ofstream out(outputFile);
+        std :: ifstream in;
+        in.open(inputFile, std::ios::binary);
+        std::ofstream out(outputFile, std::ios::binary);
 
         if (!in) {
             std::cout << "Input file " << inputFile << " does not exist" << std::endl;
@@ -53,36 +78,46 @@ void commandLine::readLine()
         }
 
         if (state == COMPRESS) {
-            compress(in, out);
+            std::ofstream out_tree(outputFile + ".tree");
+            compress(in, out, out_tree);
         } else {
-            decompress(in, out, DEBUG);
+            std::ifstream in_tree(inputFile + ".tree");
+            if (!in_tree) {
+                std::cout << "Tree file " << inputFile << ".tree does not exist" << std::endl;
+                return;
+            }
+            decompress(in, in_tree, out, DEBUG);
         }
     } else{
-        std::cout << "Invalid input" << std::endl;
+        std::cout << "Invalid input. Try -h for more information" << std::endl;
         return ;
     }
 }
 
-void commandLine::compress(std::istream &in, std::ostream &out)
+void commandLine::compress(std::istream &in, std::ostream &out, std::ostream &out_tree)
 {
-    std::string input;
-    in>>input;
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    std::string input = ss.str();
     huffmanTree tree(input);
     std::string compressed = tree.compress(input);
-    out << tree;
-    out << input.size() << std::endl;
+    out_tree << tree;
+    out_tree << input.size() << std::endl;
     out << compressed;
     double ratio = (double) compressed.size() / input.size();
     std :: cout << "Compressed successfully! Compressed/Original ratio: " << ratio << std :: endl;
 }
 
-void commandLine::decompress(std::istream &in, std::ostream &out, bool DEBUG)
+void commandLine::decompress(std::istream &in, std::istream &in_tree, std::ostream &out,bool DEBUG)
 {
-    huffmanTree tree(in);
+    huffmanTree tree(in_tree);
     std::string input;
+    
     int size;
-    in>>size;
-    in>>input;
+    in_tree>>size;
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    input = ss.str();
     std::string decompressed = tree.decompress(input, size);
     if (DEBUG) {
         for (char ch : decompressed) {
@@ -90,7 +125,6 @@ void commandLine::decompress(std::istream &in, std::ostream &out, bool DEBUG)
         }
         std::cout << std::endl;
     }
-    
     out << decompressed;
     std :: cout << "Decompressed successfully!" << std :: endl;
 }
