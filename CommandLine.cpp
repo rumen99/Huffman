@@ -106,9 +106,7 @@ void commandLine::readLine()
 
 void commandLine::compress(std::istream &in, std::ostream &out, std::ostream &out_tree)
 {
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    std::string input = ss.str();
+    std::string input((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     huffmanTree tree(input);
     int size = tree.compress(input, out);
     out_tree << tree;
@@ -119,9 +117,7 @@ void commandLine::compress(std::istream &in, std::ostream &out, std::ostream &ou
 
 void commandLine::adaptive_compress(std::istream &in, std::ostream &out, std::ostream &out_tree)
 {
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    std::string input = ss.str();
+    std::string input((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     adaptiveHuffmanTree tree;
     int size = tree.compress(input, out);
     out_tree << input.size() << std::endl;
@@ -132,13 +128,9 @@ void commandLine::adaptive_compress(std::istream &in, std::ostream &out, std::os
 void commandLine::decompress(std::istream &in, std::istream &in_tree, std::ostream &out,bool DEBUG)
 {
     huffmanTree tree(in_tree);
-    std::string input;
-    
     int size;
     in_tree>>size;
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    input = ss.str();
+    std::string input((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     std::string decompressed = tree.decompress(input, size, out);
     if (DEBUG) {
         for (char ch : decompressed) {
@@ -152,13 +144,9 @@ void commandLine::decompress(std::istream &in, std::istream &in_tree, std::ostre
 void commandLine::adaptive_decompress(std::istream &in, std::istream &in_tree, std::ostream &out,bool DEBUG)
 {
     adaptiveHuffmanTree tree;
-    std::string input;
-    
     int size;
     in_tree>>size;
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    input = ss.str();
+    std::string input((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     std::string decompressed = tree.decompress(input, size, out);
     if (DEBUG) {
         for (char ch : decompressed) {
