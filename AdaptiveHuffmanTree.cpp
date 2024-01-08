@@ -98,14 +98,24 @@ int adaptiveHuffmanTree::compress (const std::string& str, std::ostream &out)  {
     }
 
     std::string compressed_output = "";
-    for (int i = 0; i < output.length(); i += 8) {
-        std::string sub = output.substr(i, 8);
-        char c = 0;
-        for (int j = 0; j < 8; j++) {
-            c <<= 1;
-            c |= (sub[j] - '0');
+    char curr = 0;
+    int bits = 0;
+    for (int i = 0; i < output.length(); i++) {
+        curr <<= 1;
+        if (output[i] == '1') {
+            curr |= 1;
         }
-        compressed_output += c;
+        bits++;
+        if (bits == 8) {
+            compressed_output += curr;
+            curr = 0;
+            bits = 0;
+        }
+    }
+    if (bits > 0)
+    {
+        curr = curr << (8 - bits);
+        compressed_output += (char) curr;
     }
     out << compressed_output;
     return compressed_output.size();
