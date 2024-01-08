@@ -10,6 +10,7 @@ void commandLine::readLine()
     
     size_t pos = 0;
     bool DEBUG = false;
+    bool adaptive = false;
     while ((pos = input.find("-")) != std::string::npos) {
         std::string option = input.substr(pos, 2);
         if (option == "-c") {
@@ -31,10 +32,11 @@ void commandLine::readLine()
         } else if (option == "-p") {
             DEBUG = true;
         } else if (option == "-h") {
-            std::cout << "Usage: -c -i <input file> -o <output file>" << std::endl;
-            std::cout << "       -d -i <input file> -o <output file> [-p]" << std::endl;
+            std::cout << "Usage: -c -i <input file> -o <output file> [-a]" << std::endl;
+            std::cout << "       -d -i <input file> -o <output file> [-p] [-a]" << std::endl;
             std::cout << "       -h" << std::endl;
             std::cout << "Options:" << std::endl;
+            std::cout << "  -a: adaptive" << std::endl;
             std::cout << "  -c: compress" << std::endl;
             std::cout << "  -d: decompress" << std::endl;
             std::cout << "  -i: input file" << std::endl;
@@ -46,7 +48,9 @@ void commandLine::readLine()
         } else if (option == "-e") {
             state = EXIT;
             return;
-        }else {
+        } else if (option == "-a") {
+            adaptive = true;
+        } else {
             std::cout << "Invalid option. Try -h for more information!" << option << std::endl;
             return;
         }
@@ -79,14 +83,20 @@ void commandLine::readLine()
 
         if (state == COMPRESS) {
             std::ofstream out_tree(outputFile + ".tree");
-            compress(in, out, out_tree);
+            if (adaptive)
+                adaptive_compress(in, out, out_tree);
+            else
+                compress(in, out, out_tree);
         } else {
             std::ifstream in_tree(inputFile + ".tree");
             if (!in_tree) {
                 std::cout << "Tree file " << inputFile << ".tree does not exist" << std::endl;
                 return;
             }
-            decompress(in, in_tree, out, DEBUG);
+            if (adaptive)
+                adaptive_decompress(in, in_tree, out, DEBUG);
+            else
+                decompress(in, in_tree, out, DEBUG);
         }
     } else{
         std::cout << "Invalid input. Try -h for more information" << std::endl;
@@ -100,11 +110,22 @@ void commandLine::compress(std::istream &in, std::ostream &out, std::ostream &ou
     ss << in.rdbuf();
     std::string input = ss.str();
     huffmanTree tree(input);
-    std::string compressed = tree.compress(input);
+    int size = tree.compress(input, out);
     out_tree << tree;
     out_tree << input.size() << std::endl;
-    out << compressed;
-    double ratio = (double) compressed.size() / input.size();
+    double ratio = (double) size / input.size();
+    std :: cout << "Compressed successfully! Compressed/Original ratio: " << ratio << std :: endl;
+}
+
+void commandLine::adaptive_compress(std::istream &in, std::ostream &out, std::ostream &out_tree)
+{
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    std::string input = ss.str();
+    adaptiveHuffmanTree tree;
+    int size = tree.compress(input, out);
+    out_tree << input.size() << std::endl;
+    double ratio = (double) size / input.size();
     std :: cout << "Compressed successfully! Compressed/Original ratio: " << ratio << std :: endl;
 }
 
@@ -118,13 +139,32 @@ void commandLine::decompress(std::istream &in, std::istream &in_tree, std::ostre
     std::ostringstream ss;
     ss << in.rdbuf();
     input = ss.str();
-    std::string decompressed = tree.decompress(input, size);
+    std::string decompressed = tree.decompress(input, size, out);
     if (DEBUG) {
         for (char ch : decompressed) {
             std::cout << (int) ch << " ";
         }
         std::cout << std::endl;
     }
-    out << decompressed;
+    std :: cout << "Decompressed successfully!" << std :: endl;
+}
+
+void commandLine::adaptive_decompress(std::istream &in, std::istream &in_tree, std::ostream &out,bool DEBUG)
+{
+    adaptiveHuffmanTree tree;
+    std::string input;
+    
+    int size;
+    in_tree>>size;
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    input = ss.str();
+    std::string decompressed = tree.decompress(input, size, out);
+    if (DEBUG) {
+        for (char ch : decompressed) {
+            std::cout << (int) ch << " ";
+        }
+        std::cout << std::endl;
+    }
     std :: cout << "Decompressed successfully!" << std :: endl;
 }

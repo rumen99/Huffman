@@ -27,8 +27,8 @@ public:
     huffmanTree(const std::string &);
     huffmanTree(std::istream &in);
     ~huffmanTree();
-    std::string compress(const std::string str)  const;
-    std::string decompress(const std::string str, const int size) const;
+    int compress(const std::string &str, std::ostream &out)  const;
+    std::string decompress(const std::string &str, const int size, std::ostream &out) const;
     void print(std::ostream &out) const;
     void testPrint() const;
 };

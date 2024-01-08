@@ -63,7 +63,7 @@ void huffmanTree::buildCode(node* root, std:: string num)
     buildCode(root->right, (num+"1"));
 }
 
-std::string huffmanTree::compress(const std::string str) const
+int huffmanTree::compress(const std::string& str, std::ostream &out) const
 {
     std::string output = "";
     int curr = 0;
@@ -96,8 +96,8 @@ std::string huffmanTree::compress(const std::string str) const
         curr = curr << (8 - bits);
         output += (char) curr;
     }
-
-    return output;
+    out << output;
+    return output.size();
 }
 
 void huffmanTree::printTree(node* root, std::ostream &out) const
@@ -189,7 +189,7 @@ huffmanTree::node* huffmanTree::buildTree(std::istream &in)
     return temp;
 }
 
-std::string huffmanTree::decompress(const std::string str, const int size) const
+std::string huffmanTree::decompress(const std::string& str, const int size, std::ostream &out) const
 {
     std::string output = "";
     node *curr = root;
@@ -216,5 +216,6 @@ std::string huffmanTree::decompress(const std::string str, const int size) const
             }
         }
     }
+    out << output;
     return output;
 }
