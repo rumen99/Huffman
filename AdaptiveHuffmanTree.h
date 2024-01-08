@@ -5,6 +5,11 @@
 class adaptiveHuffmanTree
 {
 private:
+    /*!
+        @param root - указател към корена на дървото
+        @param NYT - указател към върха NYT
+        @param symbols - масив, който съдържа указатели към всеки символ
+    */
     struct node
     {
         char data;
@@ -26,6 +31,19 @@ private:
 public:
     adaptiveHuffmanTree();
     ~adaptiveHuffmanTree();
+
+    /*!
+        @param str - низ, който ще се компресира
+        @param out - изходен поток, в който ще се изведе компресираната версия на низа
+        @return - връща броя на символите в компресирания низ
+    */
     int compress(const std::string& str, std::ostream &out);
+
+    /*!
+        @param str - низ, който ще се декомпресира
+        @param size - броя на символите в некомпресирания низ
+        @param out - изходен поток, в който ще се изведе декомпресираната версия на низа
+        @return - връща декомпресирания низ
+    */
     std::string decompress(const std::string& str, const int& size, std::ostream &out);
 };
