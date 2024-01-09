@@ -31,6 +31,7 @@ private:
 public:
     adaptiveHuffmanTree();
     ~adaptiveHuffmanTree();
+    void printTree(node *temp);
 
     /*!
         @param str - низ, който ще се компресира

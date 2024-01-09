@@ -57,6 +57,16 @@ void adaptiveHuffmanTree::recalc(node *temp) {
     }
 }
 
+void adaptiveHuffmanTree::printTree(node *temp) {
+    if (temp == nullptr)
+    {
+        return;
+    }
+    std::cout << temp << " "<< temp->data << " " << temp->weight << " " << (temp->left != nullptr ? temp->left->weight : 0) << " " << (temp->right != nullptr ? temp->right->weight : 0) << std::endl;
+    printTree(temp->left);
+    printTree(temp->right);
+}
+
 adaptiveHuffmanTree::node* adaptiveHuffmanTree::addNode(char c) {
     node *temp = new node();
     temp->data = c;
@@ -78,7 +88,6 @@ adaptiveHuffmanTree::node* adaptiveHuffmanTree::addNode(char c) {
 }
 int adaptiveHuffmanTree::compress (const std::string& str, std::ostream &out)  {
     std::string output = "";
-    
     for (int i = 0; i < str.length(); i++)
     {
         node *temp;
@@ -117,6 +126,7 @@ int adaptiveHuffmanTree::compress (const std::string& str, std::ostream &out)  {
         curr = curr << (8 - bits);
         compressed_output += (char) curr;
     }
+    
     out << compressed_output;
     return compressed_output.size();
 
